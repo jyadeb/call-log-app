@@ -21,7 +21,7 @@ class Call(models.Model):
         OTHER = "other", "Other"
 
     firm = models.ForeignKey(Firm, on_delete=models.CASCADE, related_name="calls")
-    date = models.DateField
+    date = models.DateField()
     contact_name = models.CharField(max_length=200, blank=True)
     contact_role = models.CharField(max_length=200, blank=True)
     outcome = models.CharField(max_length=20, choices=Outcome.choices)
