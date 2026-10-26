@@ -36,4 +36,19 @@ class FirmSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "city", "notes", "calls"]
 
 
-    
+# the gate at the front of /parse/
+class ParseInputSerializer(serializers.Serializer):
+    notes = serializers.CharField(max_length=4000)
+
+# PreviewSerializer checks the AI's dict in Python.
+# Although the schema already forces the shape, this enforces the rules again so a change in model or API can't slip a bad vaue through
+# Every field is required but may be null --> "the notes didn't say"
+class PreviewSerializer(serializers.Serializer):
+    firm_name = serializers.CharField(allow_null=True)
+    contact_name = serializers.CharField(allow_null=True, max_length=200)
+    contact_role = serializers.CharField(allow_null=True, max_length=200)
+    next_action  = serializers.CharField(allow_null=True, max_length=300)
+    outcome = serializers.ChoiceField(choices=Call.Outcome.choices)
+    reason = serializers.CharField(allow_null=True)
+    follow_up_date = serializers.DateField(allow_null=True)
+

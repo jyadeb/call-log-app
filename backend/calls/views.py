@@ -4,9 +4,18 @@ Three decisions: which rows, which serializer, which status code.
 """
 
 from django.utils import timezone
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from . import ai
 from .models import Firm, Call
-from .serializers import CallSerializer, FirmSerializer
+from .serializers import (
+    CallSerializer,
+    FirmSerializer,
+    ParseInputSerializer,
+    PreviewSerializer,
+)
 
 # the main view at /api/calls/
 # GET --> get_queryset picks rows --> serializer writes JSON --> 200
@@ -51,3 +60,37 @@ class CallsDue(generics.ListAPIView):
 class FirmDetail(generics.RetrieveAPIView):
     queryset = Firm.objects.all()
     serializer_class = FirmSerializer
+
+# POST /api/calls/parse/.
+# Checks input -> asks AI
+# Checks output -> looks up firm -> 200. Never saves anything
+class ParseCall(APIView):
+    def post(self, request):
+        inp = ParseInputSerializer(data=request.data)
+        inp.is_valid(raise_exception=True)
+
+        # parsing the notes using ai.py with error catching
+        try:
+            raw = ai.parse_notes(inp.validated_data["notes"], timezone.localdate())
+        except ai.UpstreamError as e:
+            return Response({"error": "AI service failed", "detail": str(e)},
+                            status=status.HTTP_502_BAD_GATEWAY)
+        except ai.BadOutputError as e:
+            return Response({"error": "AI output unusable", "detail": str(e)},
+                            status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        
+        # Uses the preview serializer to check the output
+        preview = PreviewSerializer(data=raw)
+        if not preview.is_valid():
+            return Response({"error": "AI output failed validation", "detail": preview.errors}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    #confirming firm name to check output
+        name = preview.validated_data["firm_name"]
+        firm = Firm.objects.filter(name__iexact=name.strip()).first() if name else None
+        
+        return Response({
+            "preview": preview.data,
+            "firm_id": firm.id if firm else None,
+            "is_new_firm": bool(name) and firm is None,
+        })
+
