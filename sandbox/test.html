@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<body>
+  <h1>Calls</h1>
+  <p id="status">Loading…</p>
+  <pre id="calls"></pre>
+  <script>
+    /*
+     * Fetches calls from the Django API and shows one line per call.
+     * Data flow: browser → GET /api/calls/ → JSON array → map → text on page.
+     * GOTCHA: fetch only throws on network/CORS failure; check res.ok for 404/500.
+     */
+    const API = "http://127.0.0.1:8000/api/calls/";
+
+    async function loadCalls() {
+      const res = await fetch(API);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function renderCalls(calls) {
+      const lines = calls.map((c) => `${c.date}: ${c.outcome}`);
+      document.getElementById("calls").textContent = lines.join("\n");
+      document.getElementById("status").textContent = `${calls.length} calls`;
+    }
+
+    loadCalls()
+      .then(renderCalls)
+      .catch((err) => {
+        document.getElementById("status").textContent = `Failed: ${err.message}`;
+      });
+  </script>
+</body>
+</html>
