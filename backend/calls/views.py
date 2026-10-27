@@ -61,6 +61,13 @@ class FirmDetail(generics.RetrieveAPIView):
     queryset = Firm.objects.all()
     serializer_class = FirmSerializer
 
+# Lists every firm and creates new ones at /api/firms/
+# GET -> all firms (each with its calls nested) -> 200
+# POST {"name": ...} -> validated -> row saved -> 201 or 400 if name missing
+class FirmListCreate(generics.ListCreateAPIView):
+    queryset = Firm.objects.prefetch_related("calls").order_by("name") #loads all calls in one extra query instead of one per firm
+    serializer_class = FirmSerializer
+
 # POST /api/calls/parse/.
 # Checks input -> asks AI
 # Checks output -> looks up firm -> 200. Never saves anything
