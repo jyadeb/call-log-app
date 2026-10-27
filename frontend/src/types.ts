@@ -20,3 +20,28 @@ export type Call = {
     follow_up_date: string | null;
     raw_notes: string;
 };
+
+// this is what POST /api/calls/parse/ returns
+// every preview field can be null 
+// NewCall POSTs notes -> Django asks the AI -> ParseResponse -> editable form
+export type Preview = {
+    firm_name: string | null;
+    contact_name: string | null;
+    contact_role: string | null;
+    next_action: string | null;
+    outcome: Outcome;
+    reason: string | null;
+    follow_up_date: string | null;
+}
+
+export type ParseResponse = {
+    preview: Preview;
+    firm_id: number | null;
+    is_new_firm: boolean;
+}
+
+//the only firm fields the picker uses
+export type Firm = {
+    id: number;
+    name: string;
+}

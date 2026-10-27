@@ -10,7 +10,7 @@ import type {Call, Outcome} from "./types";
 
 const API_URL = "http://localhost:8000/api/calls/";
 
-export default function CallList() {
+export default function CallList({refreshKey}: {refreshKey:number}) {
     const [calls, setCalls] = useState<Call[]>([]); //calls is current value and setCalls replaces the value and triggers re-render
     const [error, setError] = useState<string | null>(null);
     const [outcome, setOutcome] = useState<Outcome | "">(""); // "" means all
@@ -34,7 +34,7 @@ export default function CallList() {
         return () => {
             ignore = true;
         }
-    }, [outcome]);
+    }, [outcome, refreshKey]);
 
     if (error) return <p>Failed: {error}</p>;
 
