@@ -21,14 +21,13 @@ from dotenv import load_dotenv
 load_dotenv(BASE_DIR / ".env")
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5")
-
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL") or "claude-haiku-5-5"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-dev-only-not-for-deployment")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or "django-insecure-dev-only-not-for-deployment"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
