@@ -28,7 +28,7 @@ ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5")
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(+u5#*j%0zbv8hschothtgk(+gnt5j)v!44i91=)8cptlx(#a^'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-dev-only-not-for-deployment")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
